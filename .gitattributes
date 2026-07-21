@@ -1,0 +1,16 @@
+# Normalize line endings for everyone, regardless of OS or editor settings.
+# This means: no matter what OS someone edits a file on, git stores it with
+# LF endings in the repository - so diffs only ever show real code changes,
+# never invisible line-ending noise.
+
+* text=auto eol=lf
+
+# Binary files should never be line-ending-converted
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
