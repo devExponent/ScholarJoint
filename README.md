@@ -2,9 +2,9 @@
 
 # 📖 Scholarjoint
 
-**A role-based conference & journal management portal — built for Authors, Reviewers, and Conference Admins.**
+**A conference and journal management portal for the people who actually run one: admins, reviewers, and the authors submitting their work.**
 
-*Submit abstracts, assign reviewers, collect feedback, and manage the whole review pipeline from one place.*
+*From "here's my abstract" to "congratulations, you're in the proceedings," all in one place.*
 
 [![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
@@ -17,31 +17,43 @@
 
 ## What is this?
 
-Scholarjoint is the frontend for a full conference/journal submission and peer-review system. An academic conference has three kinds of people using it, and this app gives each one a purpose-built portal:
+Anyone who has organized an academic conference knows the process by heart even if they've never written it down: authors submit an abstract, someone decides whether it's worth a full paper, reviewers weigh in, and eventually a decision comes back, either an acceptance and an invoice, or a polite rejection.
 
-| Role | What they do |
+Scholarjoint is that whole process, built into one portal. It's designed around three kinds of people, and the permissions between them stack on top of each other in a way that mirrors how conferences actually work: a Reviewer can do everything an Author can do, and an Admin can do everything a Reviewer can, since conference chairs are almost always reviewers themselves, and often submit their own work too.
+
+| Role | What they can do |
 |---|---|
-| 🖋️ **Author** | Browses open conferences, submits abstracts with co-authors, tracks review status, submits full papers, pays fees |
-| 🔍 **Reviewer** | Reviews the papers assigned to them, scores them against criteria, and submits structured feedback |
-| 🛡️ **Admin** | Runs the conference — configures deadlines & tracks, accepts/rejects submissions, assigns reviewers, manages payments |
+| 🖋️ **Author** | Registers, submits an abstract with co-authors, edits or withdraws it before the deadline, submits the full paper once accepted, tracks every decision, pays fees, downloads receipts |
+| 🔍 **Reviewer** | Everything an Author can do, plus: sees the papers assigned to them, downloads the file, scores it against a set of criteria, and writes feedback the author sees and notes only the admin sees |
+| 🛡️ **Admin** | Everything a Reviewer can do, plus: configures the conference itself, opens and closes submissions, accepts or rejects papers, assigns reviewers, tracks payments, and manages the reviewer pool |
 
-The interface is built to feel like a real, polished academic-journal product — not a generic admin dashboard template — with its own type system, design language, and a clean architecture that's ready to plug into a real backend when one exists.
+An Author never sees another author's submission or who's reviewing it. A Reviewer never sees who wrote the paper they're scoring, or what other reviewers said about it. Only the Admin sees the whole picture and makes the final call.
 
 ---
 
-## ✨ Features
+## A few terms worth knowing
 
-**Multi-conference support** — Admins can run several conferences at once, each with its own deadlines, fees, and tracks. Authors only see conferences still open for abstract submission, sorted by soonest deadline.
+**Conference.** The event itself, tracks, deadlines, and fees all belong to one.
 
-**Full co-author workflow** — add, edit, reorder, and remove co-authors on a submission; assign a corresponding author; live word-count validation against each conference's own abstract length limit.
+**Track.** A subject area within a conference, like "AI & Ethics" or "Human-Computer Interaction." Authors pick one when they submit, which is how admins know who's qualified to review it.
 
-**End-to-end review pipeline** — Admin assigns a paper to one or more reviewers → reviewer sees it on their dashboard → submits scores, a recommendation, comments to the author, and confidential notes to the admin → Admin sees the review land in real time.
+**Abstract.** A short summary, usually 150 to 300 words, submitted before the full paper. Nothing gets a full paper review until the abstract clears first.
 
-**Role-aware access** — Admins can browse into the Author and Reviewer sections too (matching how a real conference chair often *is* also a reviewer), with the sidebar and page context adapting to whichever section is being viewed.
+**Deadline.** Every deadline in the system carries a timezone, and once it passes, the door closes. No late submissions sneaking in.
 
-**A UI that actually holds up at any screen size** — a sidebar that collapses on demand at any width (not just mobile) and remembers your preference, cards and forms that reflow instead of clipping text, and a mobile drawer nav.
+**Affiliation.** An author's institution and department. Shows up next to their name everywhere their identity is visible.
 
-**Full client-side validation** — password rules, required-field checks, ORCID/email format checks, duplicate co-author email detection, word-count limits — all enforced before anything hits the data layer.
+---
+
+## How a paper moves through the system
+
+It starts with registration: name, email, a password with some real requirements, institution and department, country, and an optional ORCID. A verification email confirms the account before anyone can log in.
+
+From there, an Author picks a conference that's still accepting abstracts, writes their summary, adds any co-authors (each one just metadata, no login of their own), and submits. The Admin sees it land on their dashboard alongside every other submission, and can accept it, reject it, or ask for a revision.
+
+Once accepted, the Admin assigns it to one or more reviewers with relevant expertise. Each reviewer scores the paper on originality, clarity, contribution, and technical quality, writes comments the author will eventually see, and adds any confidential notes just for the Admin. The Admin decides how much of that feedback gets shared.
+
+If the paper is accepted outright, the Author gets invited to submit the full version and pay the conference fee. Receipts, invoices, and a running history of every decision stay attached to the submission the whole way through.
 
 ---
 
@@ -51,10 +63,8 @@ The interface is built to feel like a real, polished academic-journal product �
 |---|---|
 | Framework | React 19 + TypeScript, built with Vite |
 | Routing | React Router 7 |
-| Styling | Tailwind CSS v4, with a custom design token system (see `src/index.css`) |
-| UI primitives | Hand-built, shadcn/ui-style components on top of Radix UI (`src/components/ui/`) |
+| UI primitives | Hand-built, shadcn/ui style components on top of Radix UI (`src/components/ui/`) |
 | Icons | lucide-react |
-| Data layer | A mock service layer (see [Architecture](#-architecture--the-mock-data-layer) below) — no backend required to run |
 
 ---
 
@@ -67,16 +77,6 @@ npm run dev
 
 Open the URL Vite prints (usually **http://localhost:5173**).
 
-### Demo accounts
-
-No backend, no passwords to remember — any password works for these three seeded accounts:
-
-| Role | Email |
-|---|---|
-| Admin | `admin@scholarjoint.dev` |
-| Reviewer | `reviewer@scholarjoint.dev` |
-| Author | `author@scholarjoint.dev` |
-
 ### Other scripts
 
 ```bash
@@ -87,32 +87,13 @@ npm run lint      # runs oxlint
 
 ---
 
-## 🏗️ Architecture — the mock data layer
-
-There's no backend yet, but the app isn't wired directly to fake data either — everything goes through one service layer:
-
-```
-src/services/api.ts
-```
-
-Every function in that file simulates a real network call: it fakes a bit of latency, reads/writes from a persisted store, and returns a Promise — exactly like a real `fetch()` call would. Every page in the app calls *these* functions, never the underlying mock data directly.
-
-**Why this matters:** when a real backend exists, this is the *only file that needs to change*. Swap the body of each function for a real `fetch()` call to your API, keep the same function signature, and every page, loading state, and form in the app keeps working without modification.
-
-The mock "database" itself persists to `localStorage` (not just in-memory), which means:
-- Data survives a page refresh
-- Actions in one browser tab (e.g. an Author submitting a paper) are visible in another tab (e.g. an Admin reviewing it) — genuinely useful for testing the full multi-role flow without a real backend
-- If test data ever gets messy, run `window.__resetScholarjointMockData()` in the browser console to wipe it back to the original seed data
-
----
-
 ## 📁 Project structure
 
 ```
 src/
 ├── types/            # Every shared TypeScript type (User, Submission, Review, Conference...)
 ├── data/mockDb.ts     # Seed data - the starting state before any user interaction
-├── services/api.ts     # The mock service layer (see Architecture above)
+├── services/api.ts     # The data layer every page talks to
 ├── context/            # Auth session state
 ├── routes/AppRoutes.tsx  # Every route in the app, grouped by role
 ├── components/
@@ -128,29 +109,3 @@ src/
 ```
 
 ---
-
-## 🗺️ Roadmap
-
-Built and working today:
-
-- ✅ Auth (register/login) with role-based routing
-- ✅ Multi-conference creation & selection, scoped tracks & deadlines
-- ✅ Abstract submission with full co-author management
-- ✅ Reviewer assignment, structured review submission
-- ✅ Admin decisions (accept/reject/request revision)
-- ✅ Payments tracking (manual "mark as paid")
-- ✅ Profile settings with full validation
-
-Not yet built (natural next steps):
-
-- ⬜ Full paper file upload (currently abstract-only; the pattern is identical to the abstract form, just add a file picker)
-- ⬜ A "View Review" detail screen for Admin to read a submitted review's full content (currently shows status only)
-- ⬜ Real, event-driven notifications (currently static sample data)
-- ⬜ Bulk email tools, audit logs, data export
-- ⬜ Real payment gateway integration
-
----
-
-## 📄 License
-
-Private project — not currently licensed for reuse.
